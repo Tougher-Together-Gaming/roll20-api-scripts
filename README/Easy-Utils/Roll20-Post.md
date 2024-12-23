@@ -1,6 +1,6 @@
 I created a script called `Easy-Utils`, a library of basic functions designed to help speed up the process of making Roll20 mods. There's also an example script, `easy-util-menu.js`, that demonstrates how to use the library in a practical way.
 
-[easy-utils.js](https://github.com/Tougher-Together-Gaming/roll20-api-scripts/blob/main/src/easy-utils/easy-utils.js)
+[easy-utils.js](https://github.com/Tougher-Together-Gaming/roll20-api-scripts/blob/main/src/easy-utils/easy-utils.js)  
 [easy-utils-menu.js](https://github.com/Tougher-Together-Gaming/roll20-api-scripts/blob/main/src/easy-utils/easy-utils-menu.js)
 
 # 📜 **Features**
