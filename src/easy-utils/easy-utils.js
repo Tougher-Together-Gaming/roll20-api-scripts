@@ -2065,7 +2065,7 @@ const EASY_UTILS = (() => {
 						})
 						.replace(/\[\[(.*?)\]\]/g, (_, anExpression) => {
 
-							// REVIEW I may add a seperate prefix like [[ expr() ]] for custom expressions, but for now
+							// REVIEW I may add a separate prefix like [[ expr() ]] for custom expressions, but for now
 							// I am content having the Roll20 replace [[]] as inline rolls.
 							// styling can be cumbersome so I am going to wrap the text in a span for CSS.
 							return `<span class="inline-rolls">[[${anExpression.trim()}]]</span>`;

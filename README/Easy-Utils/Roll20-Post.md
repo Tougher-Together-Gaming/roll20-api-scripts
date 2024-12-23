@@ -3,7 +3,7 @@ I created a script called `Easy-Utils`, a library of basic functions designed to
 [easy-utils.js](https://github.com/Tougher-Together-Gaming/roll20-api-scripts/blob/main/src/easy-utils/easy-utils.js)  
 [easy-utils-menu.js](https://github.com/Tougher-Together-Gaming/roll20-api-scripts/blob/main/src/easy-utils/easy-utils-menu.js)
 
-# 📜 **Features**
+# **Features**
 
 ### 1. **Dynamic Module Loading**
 - Dynamically load and manage utility functions. Its uses closures to customize functions for the retrieving module and memory efficinecy.
