@@ -123,7 +123,7 @@ on("ready", () => {
 	console.log("Running preview...");
 	outerInlineHtml = runPreview();
 
-	const filename = "./inline-html.html";
+	const filename = "./_inline-html.html";
 	const content = `
 <!DOCTYPE html>
 <html lang="en">

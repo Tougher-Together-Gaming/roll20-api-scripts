@@ -416,4 +416,6 @@ _*/
 *.vscode/
 package-lock.json
 eslint-demo.js
+_inline-html.html
 node_modules
+

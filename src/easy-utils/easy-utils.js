@@ -2,10 +2,11 @@
  * @language: en-US
  * @title: easy-utils.js
  * @description: Utility library for Easy Modules in Roll20. Provides reusable, memory-efficient functions to simplify module development and reduce boilerplate.
+ * @comment: IDE: VsCode Extensions: CommentAnchors 
  * @author: Mhykiel
  * @version: 0.1.0
  * @license: MIT License
- * @repository: {@link https://github.com/Tougher-Together-Gaming/api-scripts-roll20/blob/main/src/easy-utils/easy-utils.js|GitHub Repository}
+ * @repository: {@link https://github.com/Tougher-Together-Gaming/roll20-api-scripts/blob/main/src/easy-utils/easy-utils.js|GitHub Repository}
  */
 
 // ANCHOR Object: EASY_MODULE_FORGE
@@ -116,7 +117,7 @@ const EASY_UTILS = (() => {
 		"createThemeFactory",
 	];
 
-	// These are reassigned some basic functions and PhraseFactory so EASY_UTILS can write syslog messages.
+	// These are reassigned during checkInstall to initialize Factories and provide basic syslog messages to EASY_UTILS.
 	let Utils = {};
 	let PhraseFactory = {};
 	let TemplateFactory = {};
@@ -170,16 +171,16 @@ const EASY_UTILS = (() => {
 
 				// Cache Dependencies
 				const logSyslogMessage = EASY_UTILS.getFunction({ functionName: "logSyslogMessage", moduleSettings });
-		
+
 				return ({ cssJson, htmlJson }) => {
 					try {
-		
+
 						/*******************************************************************************************************
 						 * 1. Parse JSON inputs
 						 ******************************************************************************************************/
 						const cssData = (typeof cssJson === "string") ? JSON.parse(cssJson) : cssJson;
 						const htmlData = (typeof htmlJson === "string") ? JSON.parse(htmlJson) : htmlJson;
-		
+
 						/*******************************************************************************************************
 						 * 2. Gather :root CSS variables (those starting with "--")
 						 ******************************************************************************************************/
@@ -187,23 +188,23 @@ const EASY_UTILS = (() => {
 							Object.entries(cssData.functions?.[":root"]?.style || {})
 								.filter(([cssProp]) => { return cssProp.startsWith("--"); })
 						);
-		
+
 						/*******************************************************************************************************
 						 * Subroutine Function: Replaces any var(--someVar) string with the corresponding :root CSS variable.
 						*******************************************************************************************************/
 						function resolveRootVariables(rawCssValue) {
 							if (typeof rawCssValue === "string") {
 								return rawCssValue.replace(/var\((--[a-zA-Z0-9-]+)\)/g, (_, varName) => {
-		
+
 									// If we have a known root variable, substitute it; otherwise keep the reference as-is.
 									return cssRootVariables[varName] || `var(${varName})`;
 								});
 							}
-		
+
 							// Graceful failover
 							return rawCssValue;
 						}
-		
+
 						/*******************************************************************************************************
 						 * Subroutine Function: Merges new styles into the current styles, but respects !important by placing those
 						*******************************************************************************************************/
@@ -211,7 +212,7 @@ const EASY_UTILS = (() => {
 							for (const [cssPropName, rawCssValue] of Object.entries(newCssRule)) {
 								// Resolve var(--xyz) references first
 								const resolvedCssValue = resolveRootVariables(rawCssValue);
-		
+
 								// If it includes !important, store it in inlineStyles
 								if (
 									typeof resolvedCssValue === "string" &&
@@ -224,57 +225,57 @@ const EASY_UTILS = (() => {
 									existingCssStyle[cssPropName] = resolvedCssValue;
 								}
 							}
-		
+
 							// Graceful failover
 							return existingCssStyle;
 						}
-		
+
 						/*******************************************************************************************************
 						 * Subroutine Function: Checks for attribute-based CSS selectors and merges styles if matched.
 						*******************************************************************************************************/
 						function applyAttributeSelectors(focusHtmlElement, focusHtmlProps, existingCssStyle) {
-		
+
 							// If there are no attribute-based rules, skip
 							if (!cssData.attributes) {
 								return existingCssStyle;
 							}
-		
+
 							// Iterate each attribute selector in CSS (e.g., `[role="foo"]`, `div[role="foo"]`)
 							for (const attributeSelector of Object.keys(cssData.attributes)) {
 								const cssRuleObject = cssData.attributes[attributeSelector];
-		
+
 								// Try to parse something like `div[role="remedy"]` or `[hidden]`
 								const match = attributeSelector.match(/^([a-zA-Z0-9]+)?\[([\w-]+)(?:=["']?(.*?)["']?)?\]$/);
 								if (!match) continue;
-		
+
 								const targetHtmlElement = match[1]; // e.g., "div"
 								const targetHtmlAttrName = match[2]; // e.g., "role"
 								const targetHtmlAttrValue = match[3]; // e.g., "remedy"
-		
+
 								// If this selector includes a specific element, check if we match
 								if (targetHtmlElement && focusHtmlElement !== targetHtmlElement) {
 									continue;
 								}
-		
+
 								// If the focus node doesn’t have the required attribute, skip
 								if (!(targetHtmlAttrName in focusHtmlProps)) {
 									continue;
 								}
-		
+
 								// If the attribute had a required value, verify it matches
 								if (targetHtmlAttrValue && focusHtmlProps[targetHtmlAttrName] !== targetHtmlAttrValue) {
 									continue;
 								}
-		
+
 								// If we match, apply the CSS rule
 								const attributeCssStyles = cssRuleObject.style || {};
 								overwriteStyles(attributeCssStyles, existingCssStyle, focusHtmlProps.inlineStyle);
 							}
-		
+
 							// Graceful failover
 							return existingCssStyle;
 						}
-		
+
 						/*******************************************************************************************************
 						 * Subroutine Function: Applies pseudo class rules such as <element>:nth-child(even), <element>:first-child, etc.
 						*******************************************************************************************************/
@@ -283,33 +284,33 @@ const EASY_UTILS = (() => {
 							if (!cssData.functions) {
 								return existingCssStyle;
 							}
-		
+
 							const focusHtmlElement = focusHtmlNode.element;
 							const focusHtmlProps = focusHtmlNode.props;
 							const { childIndex, children } = focusHtmlNode;
-		
+
 							// Loop over each pseudo-like selector in cssData.functions
 							for (const [cssSelector, cssRuleObject] of Object.entries(cssData.functions)) {
-		
+
 								// Skip :root (already handled)
 								if (cssSelector === ":root") {
 									continue;
 								}
-		
+
 								// Attempt to match forms like "div:nth-child(even)" or "p:first-child"
 								const match = cssSelector.match(/^([a-zA-Z0-9]+)?(:[a-zA-Z-]+(?:\([^)]+\))?)$/);
 								if (!match) continue;
-		
+
 								const targetHtmlElement = match[1] || "*"; // default to universal
 								const pseudoPart = match[2];
-		
+
 								// If the focus node’s element doesn’t match the target (and it’s not "*"), skip
 								if (focusHtmlElement !== targetHtmlElement && targetHtmlElement !== "*") {
 									continue;
 								}
-		
+
 								const pseudoClassStyles = cssRuleObject.style;
-		
+
 								// Evaluate the pseudo-class
 								switch (true) {
 								//----------------------------------------------------------------
@@ -318,7 +319,7 @@ const EASY_UTILS = (() => {
 								case /:nth-child\((.+)\)$/.test(pseudoPart): {
 									const targetChildPosition = pseudoPart.match(/:nth-child\((.+)\)$/)?.[1]?.trim();
 									if (!targetChildPosition || !childIndex) break;
-		
+
 									let shouldApply = false;
 									switch (true) {
 									case targetChildPosition === "even" && childIndex % 2 === 0:
@@ -330,21 +331,21 @@ const EASY_UTILS = (() => {
 									case !isNaN(Number(targetChildPosition)) && childIndex === Number(targetChildPosition):
 										shouldApply = true;
 										break;
-		
+
 										// TODO Add more logic for (An+B) and other patterns
-		
+
 										// Default: No match
 									default:
 										shouldApply = false;
 										break;
 									}
-		
+
 									if (shouldApply) {
 										overwriteStyles(pseudoClassStyles || {}, existingCssStyle, focusHtmlProps.inlineStyle);
 									}
 									break;
 								}
-		
+
 								//----------------------------------------------------------------
 								// :first-child
 								//----------------------------------------------------------------
@@ -354,7 +355,7 @@ const EASY_UTILS = (() => {
 									}
 									break;
 								}
-		
+
 								//----------------------------------------------------------------
 								// :last-child
 								//----------------------------------------------------------------
@@ -368,7 +369,7 @@ const EASY_UTILS = (() => {
 									}
 									break;
 								}
-		
+
 								//----------------------------------------------------------------
 								// :empty
 								//----------------------------------------------------------------
@@ -378,17 +379,17 @@ const EASY_UTILS = (() => {
 									}
 									break;
 								}
-		
+
 								// TODO Add more pseudo-classes as needed...
 								default:
 									break;
 								}
 							}
-		
+
 							// Graceful failover
 							return existingCssStyle;
 						}
-		
+
 						/*******************************************************************************************************
 						 * Main Function: Determines the final style object for a single (focus) HTML node, accounting for:
 						 *   - universal selectors (*)
@@ -407,14 +408,14 @@ const EASY_UTILS = (() => {
 							cssData
 						) {
 							const existingCssStyle = {};
-		
+
 							//----------------------------------------------------------------
 							// Universal "*"
 							//----------------------------------------------------------------
 							if (cssData.universal) {
 								overwriteStyles(cssData.universal, existingCssStyle, focusHtmlProps.inlineStyle);
 							}
-		
+
 							//----------------------------------------------------------------
 							// Element-based selectors (e.g. cssData.elements.div)
 							//----------------------------------------------------------------
@@ -422,7 +423,7 @@ const EASY_UTILS = (() => {
 								const elemObj = cssData.elements[focusHtmlElement];
 								overwriteStyles(elemObj.style || {}, existingCssStyle, focusHtmlProps.inlineStyle);
 							}
-		
+
 							//----------------------------------------------------------------
 							// Parent > child styles (e.g. `div > p`)
 							//----------------------------------------------------------------
@@ -433,12 +434,12 @@ const EASY_UTILS = (() => {
 								const childStyles = cssData.elements[parentHtmlNode.element].children[focusHtmlElement].style;
 								overwriteStyles(childStyles, existingCssStyle, focusHtmlProps.inlineStyle);
 							}
-		
+
 							//----------------------------------------------------------------
 							// Pseudo-classes (e.g. :nth-child)
 							//----------------------------------------------------------------
 							applyElementPseudoSelectors(focusHtmlNode, parentHtmlNode, existingCssStyle);
-		
+
 							//----------------------------------------------------------------
 							// Classes
 							//----------------------------------------------------------------
@@ -453,12 +454,12 @@ const EASY_UTILS = (() => {
 									);
 								}
 							});
-		
+
 							//----------------------------------------------------------------
 							// Attribute selectors
 							//----------------------------------------------------------------
 							applyAttributeSelectors(focusHtmlElement, focusHtmlProps, existingCssStyle);
-		
+
 							//----------------------------------------------------------------
 							// IDs
 							//----------------------------------------------------------------
@@ -472,30 +473,30 @@ const EASY_UTILS = (() => {
 									);
 								}
 							}
-		
+
 							return existingCssStyle;
 						}
-		
+
 						/*******************************************************************************************************
 						 * Subroutine Function: Recursively walks the HTML structure, computing styles for each node and attaching them.
 						 ******************************************************************************************************/
 						function applyStylesRecursively(focusHtmlNodeOrArray, parentHtmlNode, cssData) {
-		
+
 							// If we have an array, process each child
 							if (Array.isArray(focusHtmlNodeOrArray)) {
 								focusHtmlNodeOrArray.forEach((childNode) => {
 									applyStylesRecursively(childNode, parentHtmlNode, cssData);
 								});
 							}
-		
+
 							// If it’s an actual node object
 							else if (focusHtmlNodeOrArray && typeof focusHtmlNodeOrArray === "object") {
 								const focusHtmlElement = focusHtmlNodeOrArray.element;
 								const focusHtmlProps = focusHtmlNodeOrArray.props || {};
-		
+
 								// Ensure inlineStyles is defined so we don’t get undefined errors
 								focusHtmlProps.inlineStyle = focusHtmlProps.inlineStyle || {};
-		
+
 								// Compute final styles for this node
 								const computedStyle = getStylesForElement(
 									focusHtmlElement,
@@ -504,27 +505,27 @@ const EASY_UTILS = (() => {
 									parentHtmlNode,
 									cssData
 								);
-		
+
 								// Attach them
 								focusHtmlProps.style = { ...computedStyle };
-		
+
 								// Recurse into children
 								const children = focusHtmlNodeOrArray.children || [];
 								applyStylesRecursively(children, focusHtmlNodeOrArray, cssData);
 							}
 						}
-		
+
 						/*******************************************************************************************************
 						 * 3. Walk & apply styles to the entire HTML tree
 						 ******************************************************************************************************/
 						applyStylesRecursively(htmlData, null, cssData);
-		
-		
+
+
 						/*******************************************************************************************************
 						 * 4. Generate JSON output
 						 ******************************************************************************************************/
 						const output = JSON.stringify(htmlData, null, 2);
-		
+
 						// If verbose, log at DEBUG level
 						if (moduleSettings.verbose) {
 							logSyslogMessage({
@@ -534,10 +535,10 @@ const EASY_UTILS = (() => {
 								message: output
 							});
 						}
-		
+
 						// Return final HTML with computed styles
 						return output;
-		
+
 					} catch (err) {
 						// In case of error, log at ERROR level
 						logSyslogMessage({
@@ -546,7 +547,7 @@ const EASY_UTILS = (() => {
 							transUnitId: "30000",
 							message: `${err}`
 						});
-		
+
 						// Graceful failover: return unmodified HTML
 						return htmlJson;
 					}
@@ -563,10 +564,10 @@ const EASY_UTILS = (() => {
 		 */
 		convertCssToJson: function () {
 			return (moduleSettings) => {
-		
+
 				// Cache Dependencies
 				const logSyslogMessage = EASY_UTILS.getFunction({ functionName: "logSyslogMessage", moduleSettings });
-		
+
 				return ({ css }) => {
 					try {
 						/*******************************************************************************************************
@@ -577,7 +578,7 @@ const EASY_UTILS = (() => {
 							.replace(/\n/g, " ")             // Replace newlines with spaces
 							.replace(/\s+/g, " ")            // Collapse multiple spaces
 							.trim();                         // Remove leading/trailing spaces
-		
+
 						/*******************************************************************************************************
 						 * 2. Prepare data structure for storing rules
 						 ******************************************************************************************************/
@@ -589,13 +590,13 @@ const EASY_UTILS = (() => {
 							ids: {},
 							functions: {},
 						};
-		
+
 						/*******************************************************************************************************
 						 * 3. Define regex patterns to capture selectors and their style blocks
 						 ******************************************************************************************************/
 						const ruleRegex = /([^\{]+)\{([^\}]+)\}/g;
 						const propertiesRegex = /([\w-]+)\s*:\s*([^;]+);/g;
-		
+
 						/*******************************************************************************************************
 						 * 4. Iterate over each CSS rule block
 						 ******************************************************************************************************/
@@ -603,7 +604,7 @@ const EASY_UTILS = (() => {
 						while ((ruleMatch = ruleRegex.exec(cleanedCss))) {
 							const selectorsRaw = ruleMatch[1].trim();       // e.g. "div, p:hover, .myClass"
 							const propertiesRaw = ruleMatch[2].trim();      // e.g. "color: red; background: blue;"
-		
+
 							// Parse the style properties into an object
 							const styleObj = {};
 							let propMatch;
@@ -612,7 +613,7 @@ const EASY_UTILS = (() => {
 								const propValue = propMatch[2].trim();
 								styleObj[propKey] = propValue;
 							}
-		
+
 							/*****************************************************************************************************
 							 * 4a. Split group selectors (e.g., "div, p" => ["div", "p"])
 							 *****************************************************************************************************/
@@ -621,14 +622,14 @@ const EASY_UTILS = (() => {
 								.map(sel => { return sel.trim(); })
 								.forEach((aSelector) => {
 									switch (true) {
-		
+
 									//----------------------------------------------------------------
 									// Universal (*)
 									//----------------------------------------------------------------
 									case aSelector === "*":
 										Object.assign(cssData.universal, styleObj);
 										break;
-		
+
 										//----------------------------------------------------------------
 										// Class selectors (e.g. ".my-class")
 										//----------------------------------------------------------------
@@ -638,7 +639,7 @@ const EASY_UTILS = (() => {
 										}
 										Object.assign(cssData.classes[aSelector].style, styleObj);
 										break;
-		
+
 										//----------------------------------------------------------------
 										// ID selectors (e.g. "#my-id")
 										//----------------------------------------------------------------
@@ -648,7 +649,7 @@ const EASY_UTILS = (() => {
 										}
 										Object.assign(cssData.ids[aSelector].style, styleObj);
 										break;
-		
+
 										//----------------------------------------------------------------
 										// Attribute selectors (e.g. [role="foo"], div[role="foo"])
 										//----------------------------------------------------------------
@@ -658,7 +659,7 @@ const EASY_UTILS = (() => {
 										}
 										Object.assign(cssData.attributes[aSelector].style, styleObj);
 										break;
-		
+
 										//----------------------------------------------------------------
 										// Pseudo-classes / pseudo-elements (e.g. :hover, :root, :nth-child)
 										//----------------------------------------------------------------
@@ -668,7 +669,7 @@ const EASY_UTILS = (() => {
 										}
 										Object.assign(cssData.functions[aSelector].style, styleObj);
 										break;
-		
+
 										//----------------------------------------------------------------
 										// Child selectors (e.g. div > p, .parent > .child)
 										//----------------------------------------------------------------
@@ -676,7 +677,7 @@ const EASY_UTILS = (() => {
 										const parts = aSelector.split(">").map(s => { return s.trim(); });
 										// Start at elements as the base
 										let currentLevel = cssData.elements;
-		
+
 										parts.forEach((part, index) => {
 											if (!currentLevel[part]) {
 												currentLevel[part] = { style: {}, children: {} };
@@ -691,7 +692,7 @@ const EASY_UTILS = (() => {
 										});
 										break;
 									}
-		
+
 									//----------------------------------------------------------------
 									// Default => treat as a normal HTML element (e.g. "div", "p")
 									//----------------------------------------------------------------
@@ -704,12 +705,12 @@ const EASY_UTILS = (() => {
 									}
 								});
 						}
-		
+
 						/*******************************************************************************************************
 						 * 5. Produce the JSON output
 						 ******************************************************************************************************/
 						const output = JSON.stringify(cssData, null, 2);
-		
+
 						// If verbose, log at DEBUG level
 						if (moduleSettings.verbose) {
 							logSyslogMessage({
@@ -719,12 +720,12 @@ const EASY_UTILS = (() => {
 								message: output
 							});
 						}
-		
+
 						// Return the final JSON string
 						return output;
-		
+
 					} catch (err) {
-		
+
 						// In case of error, log at ERROR level
 						logSyslogMessage({
 							severity: 4, // WARNING
@@ -732,7 +733,7 @@ const EASY_UTILS = (() => {
 							transUnitId: "30000",
 							message: `${err}`
 						});
-		
+
 						// Return an empty fallback JSON
 						const fallback = {
 							universal: {},
@@ -742,7 +743,7 @@ const EASY_UTILS = (() => {
 							functions: {},
 							ids: {}
 						};
-		
+
 						return JSON.stringify(fallback);
 					}
 				};
@@ -1511,16 +1512,15 @@ const EASY_UTILS = (() => {
 					function loadTemplateByName(templateName) {
 						if (templateName === "chatAlert") {
 							return `
-			  <div class="alert-box">
-				  <h3>{{ title }}</h3>
-				  <p>{{ description }}</p>
-				  <div class="alert-code">
-					  <p>{{ code }}</p>
-				  </div>
-				  <p>{{ remark }}</p>
-				  <p class="alert-footer">{{ footer }}</p>
-			  </div>
-		  `;
+							<div class="alert-box">
+								<h3>{{ title }}</h3>
+								<p>{{ description }}</p>
+								<div class="alert-code">
+									<p>{{ code }}</p>
+								</div>
+								<p>{{ remark }}</p>
+								<p class="alert-footer">{{ footer }}</p>
+							</div>`;
 						}
 
 						// If no known additional template is found, return null
@@ -1663,50 +1663,49 @@ const EASY_UTILS = (() => {
 					function loadThemeByName(themeName) {
 						if (themeName === "chatAlert") {
 							return `
-		  /* Design Colors */
-		  :root {
-			  --ez-primary-background-color: #252B2C; 
-			  --ez-subdued-background-color: #f2f2f2; 
-			  --ez-text-color: #000000;
-			  --ez-overlay-text-color: #ffffff; 
-			  --ez-border-color: #000000; 
-			  --ez-shadow-color: #4d4d4d; 
-		  }
-		  
-		  .alert-box {
-			  border: 1px solid var(--ez-border-color);
-			  background-color: var(--ez-primary-background-color);
-			  padding: 10px;
-			  border-radius: 10px;
-			  color: var(--ez-text-color);
-		  }
-		  
-		  h3 {
-			  color: var(--ez-overlay-text-color);
-			  margin: 0;
-			  font-size: 1.2em;
-			  text-transform: uppercase;
-		  }
-		  
-		  p {
-			  margin: 5px 0;
-		  }
-		  
-		  .alert-code {
-			  margin: 8px 0;
-			  padding: 5px;
-			  background-color: var(--ez-subdued-background-color);
-			  border: var(--ez-shadow-color);
-			  border-radius: 5px;
-			  font-family: monospace;
-		  }
-		  
-		  .alert-footer {
-			  margin: 5px 0;
-			  font-size: 0.9em;
-			  color: var(--ez-shadow-color);
-		  }
-		  `;
+							/* Design Colors */
+							:root {
+								--ez-primary-background-color: #252B2C; 
+								--ez-subdued-background-color: #f2f2f2; 
+								--ez-text-color: #000000;
+								--ez-overlay-text-color: #ffffff; 
+								--ez-border-color: #000000; 
+								--ez-shadow-color: #4d4d4d; 
+							}
+							
+							.alert-box {
+								border: 1px solid var(--ez-border-color);
+								background-color: var(--ez-primary-background-color);
+								padding: 10px;
+								border-radius: 10px;
+								color: var(--ez-text-color);
+							}
+							
+							h3 {
+								color: var(--ez-overlay-text-color);
+								margin: 0;
+								font-size: 1.2em;
+								text-transform: uppercase;
+							}
+							
+							p {
+								margin: 5px 0;
+							}
+							
+							.alert-code {
+								margin: 8px 0;
+								padding: 5px;
+								background-color: var(--ez-subdued-background-color);
+								border: var(--ez-shadow-color);
+								border-radius: 5px;
+								font-family: monospace;
+							}
+							
+							.alert-footer {
+								margin: 5px 0;
+								font-size: 0.9em;
+								color: var(--ez-shadow-color);
+							}`;
 						}
 
 						// If no matching additional theme is found, return null
@@ -2326,7 +2325,7 @@ const EASY_UTILS = (() => {
 	};
 
 	on("ready", () => {
-		
+
 		state.EasyModuleVault = {};
 
 		const continueMod = checkInstall();

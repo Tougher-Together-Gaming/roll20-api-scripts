@@ -1,9 +1,9 @@
 {
-  "name": "default-game-assets",
+  "name": "roll20-api-scripts",
   "version": "1.0.0",
   "type": "module",
-  "description": "Default game assets like maps, tokens, and handouts used in nearly all games.",
-  "main": "./templates/eslint-demo.js",
+  "description": "These are API scripts and modules for use with Roll20.",
+  "main": "./src/easy-utils/easy-utils",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
