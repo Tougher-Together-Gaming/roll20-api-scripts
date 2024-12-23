@@ -11,15 +11,21 @@ I created a script called `Easy-Utils`, a library of basic functions designed to
 - A special global Object called a Forge contains Factories that present API for specialized use across all APi scripts making use of EASY_UTILS.
 	- These factories are Phrase, Template, and Theme factories.
 
+![function loader](https://raw.githubusercontent.com/Tougher-Together-Gaming/roll20-api-scripts/refs/heads/main/README/Easy-Utils/images/ez-function-loader-closures.png)
+
 ### 2. **Advanced Logging System**
 - Log messages in a structured, syslog-like format to enhance debugging and traceability.
 - Multilingual logging support through `PhraseFactory`.
 
+![syslog messages](https://raw.githubusercontent.com/Tougher-Together-Gaming/roll20-api-scripts/refs/heads/main/README/Easy-Utils/images/ez-get-syslog-style-messages.png)
+
 ### 3. **Translation Support**
 - Integrate with `PhraseFactory` to support multilingual scripts.
-- Players can select from available languages that they want their whispers displayed in.
+- Players can select from available languages that they want their whispers displayed in. Multilingual AT THE SAME TIME.
 - Script makers can upload custom dictionaries for different languages.
 - dictionaries that are not used by any players are unloaded form memory.
+
+![player specific l10n](https://raw.githubusercontent.com/Tougher-Together-Gaming/roll20-api-scripts/refs/heads/main/README/Easy-Utils/images/ez-player-specific-language.png)
 
 ### 4. **Use CSS and HTML**
 - There is a collection of functions that make working with raw HTML and CSS easy.
@@ -28,10 +34,20 @@ I created a script called `Easy-Utils`, a library of basic functions designed to
 - You can use handle bar expressions `{{ ... }}` in HTMl templates for placeholders.
 - You can use `var()` in CSS to apply universal color palettes.
 
-### 5. **Robust Error Handling**
-- Utility functions provide clear and actionable error messages to improve debugging.
+![raw html css chat modals](https://raw.githubusercontent.com/Tougher-Together-Gaming/roll20-api-scripts/refs/heads/main/README/Easy-Utils/images/ez-work-with-raw-css-and-html.png)
+
+![custom menu](https://raw.githubusercontent.com/Tougher-Together-Gaming/roll20-api-scripts/refs/heads/main/README/Easy-Utils/images/ez-rolebased-menu.png)
+
+*Note the menu is different for GMs.
+
+### 5. **Override Templates and Themes**
+- Replace template expressions (`{{..}}`) and CSS variables to override colors and structure.
+- Reuse the same HTML template and CSS theme to display different types of messages.
+- With players picking their own language, or defaulting to every "EASY" module to a different language.
+
+![various alerts](https://raw.githubusercontent.com/Tougher-Together-Gaming/roll20-api-scripts/refs/heads/main/README/Easy-Utils/images/ez-example-alerts.png)
 
 ### 6. **Developer Convenience**
 - Functions like `logSyslogMessage` enable structured and consistent logging across scripts.
-- Quickly build new APi scripts using a shared library of utility fuctions.
-- `easy-utils-menu.js` is an example of how a mod might look
+- Quickly build new APi scripts using a shared library of utility functions.
+- `easy-utils-menu.js` is an example of how a mod might look.
