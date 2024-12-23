@@ -597,7 +597,6 @@ const EASY_MENU = (() => {
 			});
 
 			// TODO Add Templates
-			// Convert HTML into JSON representation
 			const menuHtml = `
 <div class="menu-box">
 	<h3>{{ title }}</h3>
@@ -616,7 +615,6 @@ const EASY_MENU = (() => {
 			});
 
 			// TODO Add Themes
-			// Convert CSS into JSON representation
 			const menuCss = `
 :root {
   /* Palette Colors */
