@@ -2,7 +2,7 @@
  * @language: en-US
  * @title: easy-utils.js
  * @description: Utility library for Easy Modules in Roll20. Provides reusable, memory-efficient functions to simplify module development and reduce boilerplate.
- * @comment: IDE: VsCode Extensions: CommentAnchors 
+ * @comment: Developed using VSCode with extensions: Comment Anchors, ESLint, Inline Hasher (for ELF hash of dictionary transUnitIds), Spell Checker, and Live Server, along with Grunt for task automation.
  * @author: Mhykiel
  * @version: 0.1.0
  * @license: MIT License
@@ -120,8 +120,8 @@ const EASY_UTILS = (() => {
 	// These are reassigned during checkInstall to initialize Factories and provide basic syslog messages to EASY_UTILS.
 	let Utils = {};
 	let PhraseFactory = {};
-	let TemplateFactory = {};
-	let ThemeFactory = {};
+	//let TemplateFactory = {};
+	//let ThemeFactory = {};
 
 	// !SECTION END of Configuration and Settings
 
@@ -1896,7 +1896,9 @@ const EASY_UTILS = (() => {
 		getGlobalSettings: function () {
 			// eslint-disable-next-line no-unused-vars
 			return (moduleSettings) => {
-				return globalSettings;
+				return () => {
+					return globalSettings;
+				};
 			};
 		},
 
@@ -2407,7 +2409,8 @@ const EASY_UTILS = (() => {
 	// !SECTION END of PUBLIC INTERFACE
 })();
 
-/* For Local testing when mocking Roll20 */
+/* For Local testing when mocking Roll20
 export { EASY_MODULE_FORGE };
 export { EASY_UTILS };
+*/
 
