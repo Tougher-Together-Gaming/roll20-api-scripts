@@ -27,7 +27,7 @@ module.exports = function (grunt) {
 				files: [{
 					expand: true,            // Enable dynamic expansion
 					cwd: "src/",             // Source folder
-					src: ["**/*.js", "!**/_/**"], // Include all JS files, exclude folders starting with "_"
+					src: ["**/*.js", "!**/_/**", "!**/MockUps/**"], // Include all JS files, exclude folders starting with "_"
 					dest: "src/minified/",   // Destination folder
 					ext: ".min.js",          // Extension for the minified files
 					extDot: "last",          // Replace only the last dot in filenames
